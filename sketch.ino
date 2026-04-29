@@ -43,3 +43,39 @@ void acenderLed(int led) {
   digitalWrite(LED_VERM, LOW);
   digitalWrite(led, HIGH);
 }
+
+void mostrarPergunta() {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(perguntaAtual + 1);
+  lcd.print("/");
+  lcd.print(TOTAL_PERGUNTAS);
+  lcd.print(" ");
+  lcd.print(perguntas[perguntaAtual]);
+  lcd.setCursor(0, 1);
+  lcd.print("SIM=Verde NAO=Verm");
+}
+
+void mostrarResultado() {
+  lcd.clear();
+  triagemFinalizada = true;
+
+  if (pontuacao <= 1) {
+    lcd.setCursor(0, 0);
+    lcd.print("Risco: BAIXO");
+    lcd.setCursor(0, 1);
+    lcd.print("Pet saudavel!");
+    acenderLed(LED_VERDE);
+  } else if (pontuacao <= 3) {
+    lcd.setCursor(0, 0);
+    lcd.print("Risco: MEDIO");
+    lcd.setCursor(0, 1);
+    lcd.print("Consulte em breve");
+    acenderLed(LED_AMARELO);
+  } else {
+    lcd.setCursor(0, 0);
+    lcd.print("EMERGENCIA!");
+    lcd.setCursor(0, 1);
+    lcd.print("Va ao vet AGORA!");
+    acenderLed(LED_VERM);
+  }
