@@ -83,3 +83,62 @@ void mostrarResultado() {
   Serial.print("Triagem finalizada. Pontuacao: ");
   Serial.println(pontuacao);
 }
+
+void reiniciarTriagem() {
+  perguntaAtual = 0;
+  pontuacao = 0;
+  triagemFinalizada = false;
+  acenderLed(LED_VERDE);
+  mostrarPergunta();
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(BTN_SIM, INPUT);
+  pinMode(BTN_NAO, INPUT);
+  pinMode(LED_VERDE, OUTPUT);
+  pinMode(LED_AMARELO, OUTPUT);
+  pinMode(LED_VERM, OUTPUT);
+
+  lcd.init();
+  lcd.backlight();
+
+  lcd.setCursor(0, 0);
+  lcd.print("  CLYVO VET");
+  lcd.setCursor(0, 1);
+  lcd.print(" Triagem Pet");
+  delay(2000);
+
+  reiniciarTriagem();
+}
+
+void loop() {
+  unsigned long agora = millis();
+
+  if (agora - ultimoDebounce < DEBOUNCE_DELAY) return;
+
+  if (triagemFinalizada) {
+    if (digitalRead(BTN_SIM) == HIGH || digitalRead(BTN_NAO) == HIGH) {
+      ultimoDebounce = agora;
+      reiniciarTriagem();
+    }
+    return;
+  }
+
+  if (digitalRead(BTN_SIM) == HIGH) {
+    ultimoDebounce = agora;
+    if (perguntaAtual >= 3) pontuacao++;
+    perguntaAtual++;
+    if (perguntaAtual >= TOTAL_PERGUNTAS) mostrarResultado();
+    else mostrarPergunta();
+  }
+
+  if (digitalRead(BTN_NAO) == HIGH) {
+    ultimoDebounce = agora;
+    if (perguntaAtual < 3) pontuacao++;
+    perguntaAtual++;
+    if (perguntaAtual >= TOTAL_PERGUNTAS) mostrarResultado();
+    else mostrarPergunta();
+  }
+}
