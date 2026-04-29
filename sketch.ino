@@ -79,3 +79,7 @@ void mostrarResultado() {
     lcd.print("Va ao vet AGORA!");
     acenderLed(LED_VERM);
   }
+  
+  Serial.print("Triagem finalizada. Pontuacao: ");
+  Serial.println(pontuacao);
+}
