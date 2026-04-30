@@ -79,7 +79,7 @@ void mostrarResultado() {
     lcd.print("Va ao vet AGORA!");
     acenderLed(LED_VERM);
   }
-  
+
   Serial.print("Triagem finalizada. Pontuacao: ");
   Serial.println(pontuacao);
 }
@@ -95,8 +95,8 @@ void reiniciarTriagem() {
 void setup() {
   Serial.begin(115200);
 
-  pinMode(BTN_SIM, INPUT);
-  pinMode(BTN_NAO, INPUT);
+  pinMode(BTN_SIM, INPUT_PULLUP);
+  pinMode(BTN_NAO, INPUT_PULLUP);
   pinMode(LED_VERDE, OUTPUT);
   pinMode(LED_AMARELO, OUTPUT);
   pinMode(LED_VERM, OUTPUT);
@@ -119,14 +119,14 @@ void loop() {
   if (agora - ultimoDebounce < DEBOUNCE_DELAY) return;
 
   if (triagemFinalizada) {
-    if (digitalRead(BTN_SIM) == HIGH || digitalRead(BTN_NAO) == HIGH) {
+    if (digitalRead(BTN_SIM) == LOW || digitalRead(BTN_NAO) == LOW) {
       ultimoDebounce = agora;
       reiniciarTriagem();
     }
     return;
   }
 
-  if (digitalRead(BTN_SIM) == HIGH) {
+  if (digitalRead(BTN_SIM) == LOW) {
     ultimoDebounce = agora;
     if (perguntaAtual >= 3) pontuacao++;
     perguntaAtual++;
@@ -134,7 +134,7 @@ void loop() {
     else mostrarPergunta();
   }
 
-  if (digitalRead(BTN_NAO) == HIGH) {
+  if (digitalRead(BTN_NAO) == LOW) {
     ultimoDebounce = agora;
     if (perguntaAtual < 3) pontuacao++;
     perguntaAtual++;
