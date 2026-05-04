@@ -1,5 +1,7 @@
 // BIBLIOTECAS
 
+#include <WiFi.h>
+#include <WebServer.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
@@ -10,6 +12,12 @@
 #define LED_VERDE   25
 #define LED_AMARELO 26
 #define LED_VERM    27
+
+// CONFIGURACAO DO WIFI E SERVIDOR
+
+const char* SSID = "Wokwi-GUEST";
+const char* PASSWORD = "";
+WebServer server(80);
 
 // CONFIGURACAO DO LCD
 
@@ -34,16 +42,29 @@ int pontuacao = 0;
 bool triagemFinalizada = false;
 bool teveVomito = false;
 bool teveDiarreia = false;
+String resultadoFinal = "Aguardando...";
 
 unsigned long ultimoDebounce = 0;
 const unsigned long DEBOUNCE_DELAY = 300;
 
-// LIGA OS LEDS E DESLIGA OS OUTROS
+// LIGA E DESLIGA OS LEDS
 void acenderLed(int led) {
   digitalWrite(LED_VERDE, LOW);
   digitalWrite(LED_AMARELO, LOW);
   digitalWrite(LED_VERM, LOW);
   digitalWrite(led, HIGH);
+}
+
+// CRIA A PAGINA DO DASHBOARD
+void handleRoot() {
+  String html = "<html><head><meta charset='UTF-8'><title>CLYVO VET - DASHBOARD</title></head>";
+  html += "<body style='font-family: Arial; text-align: center;'>";
+  html += "<h1>Triagem Pet - Dashboard</h1>";
+  html += "<h3>Status Atual: " + resultadoFinal + "</h3>";
+  html += "<p>Pontuacao de risco: " + String(pontuacao) + "</p>";
+  html += "<script>setTimeout(function(){location.reload();}, 3000);</script>"; // Atualiza a cada 3s
+  html += "</body></html>";
+  server.send(200, "text/html", html);
 }
 
 // MOSTRA A PERGUNTA ATUAL NO LCD
@@ -64,49 +85,48 @@ void mostrarResultado() {
   lcd.clear();
   triagemFinalizada = true;
 
-  // LOGICA PARA COMBO DE VOMITO E DIARREIA
   if (teveVomito && teveDiarreia) {
+    resultadoFinal = "EMERGENCIA (Combo detectado)";
     lcd.setCursor(0, 0);
     lcd.print("EMERGENCIA!");
     lcd.setCursor(0, 1);
     lcd.print("Vomito+Diarreia");
     acenderLed(LED_VERM);
   } else if (pontuacao <= 1) {
+    resultadoFinal = "Risco Baixo - Pet Saudavel";
     lcd.setCursor(0, 0);
     lcd.print("Risco: BAIXO");
     lcd.setCursor(0, 1);
     lcd.print("Pet saudavel!");
     acenderLed(LED_VERDE);
   } else if (pontuacao <= 3) {
+    resultadoFinal = "Risco Medio - Consulte Breve";
     lcd.setCursor(0, 0);
     lcd.print("Risco: MEDIO");
     lcd.setCursor(0, 1);
     lcd.print("Consulte breve");
     acenderLed(LED_AMARELO);
   } else {
+    resultadoFinal = "EMERGENCIA - Va ao Vet AGORA!";
     lcd.setCursor(0, 0);
     lcd.print("EMERGENCIA!");
     lcd.setCursor(0, 1);
     lcd.print("Va ao vet AGORA!");
     acenderLed(LED_VERM);
   }
-
-  Serial.print("Triagem finalizada. Pontuacao: ");
-  Serial.println(pontuacao);
 }
 
-// ZERA TUDO PARA COMEÇAR DE NOVO
 void reiniciarTriagem() {
   perguntaAtual = 0;
   pontuacao = 0;
   teveVomito = false;
   teveDiarreia = false;
   triagemFinalizada = false;
+  resultadoFinal = "Triagem em andamento...";
   acenderLed(LED_VERDE);
   mostrarPergunta();
 }
 
-// CONFIGURA O INICIO DO SISTEMA E PINOS
 void setup() {
   Serial.begin(115200);
 
@@ -119,6 +139,21 @@ void setup() {
   lcd.init();
   lcd.backlight();
 
+  // INICIA CONEXAO WIFI
+  WiFi.begin(SSID, PASSWORD, 6);
+  Serial.print("Conectando ao WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi conectado!");
+  Serial.print("IP do Dashboard: ");
+  Serial.println(WiFi.localIP());
+
+  // CONFIGURA AS ROTAS DO SERVIDOR
+  server.on("/", handleRoot);
+  server.begin();
+
   lcd.setCursor(0, 0);
   lcd.print("  CLYVO VET");
   lcd.setCursor(0, 1);
@@ -128,10 +163,10 @@ void setup() {
   reiniciarTriagem();
 }
 
-// FICA RODANDO E CHECANDO OS BOTOES
 void loop() {
+  server.handleClient();
+  
   unsigned long agora = millis();
-
   if (agora - ultimoDebounce < DEBOUNCE_DELAY) return;
 
   if (triagemFinalizada) {
