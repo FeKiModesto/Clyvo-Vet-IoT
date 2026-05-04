@@ -20,11 +20,12 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 const char* perguntas[] = {
   "Pet comendo?",
   "Bebendo agua?",
-  "Se movimenta?",
-  "Vomito/Diarreia?",
-  "Temperatura alta?"
+  "Movimentando?",
+  "Teve vomito?",
+  "Teve diarreia?",
+  "Tem febre?"
 };
-const int TOTAL_PERGUNTAS = 5;
+const int TOTAL_PERGUNTAS = 6;
 
 // VARIAVEIS DE CONTROLE
 
@@ -53,7 +54,7 @@ void mostrarPergunta() {
   lcd.print(" ");
   lcd.print(perguntas[perguntaAtual]);
   lcd.setCursor(0, 1);
-  lcd.print("SIM=Verde NAO=Verm");
+  lcd.print("S:Verde N:Verm");
 }
 
 void mostrarResultado() {
@@ -70,7 +71,7 @@ void mostrarResultado() {
     lcd.setCursor(0, 0);
     lcd.print("Risco: MEDIO");
     lcd.setCursor(0, 1);
-    lcd.print("Consulte em breve");
+    lcd.print("Consulte breve");
     acenderLed(LED_AMARELO);
   } else {
     lcd.setCursor(0, 0);
@@ -141,4 +142,6 @@ void loop() {
     if (perguntaAtual >= TOTAL_PERGUNTAS) mostrarResultado();
     else mostrarPergunta();
   }
+
+  delay(10);
 }
