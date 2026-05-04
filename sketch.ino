@@ -32,12 +32,13 @@ const int TOTAL_PERGUNTAS = 6;
 int perguntaAtual = 0;
 int pontuacao = 0;
 bool triagemFinalizada = false;
+bool teveVomito = false;
+bool teveDiarreia = false;
 
 unsigned long ultimoDebounce = 0;
 const unsigned long DEBOUNCE_DELAY = 300;
 
-// FUNCOES AUXILIARES
-
+// LIGA OS LEDS E DESLIGA OS OUTROS
 void acenderLed(int led) {
   digitalWrite(LED_VERDE, LOW);
   digitalWrite(LED_AMARELO, LOW);
@@ -45,6 +46,7 @@ void acenderLed(int led) {
   digitalWrite(led, HIGH);
 }
 
+// MOSTRA A PERGUNTA ATUAL NO LCD
 void mostrarPergunta() {
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -57,11 +59,19 @@ void mostrarPergunta() {
   lcd.print("S:Verde N:Verm");
 }
 
+// CALCULA OS PONTOS E MOSTRA O RESULTADO FINAL
 void mostrarResultado() {
   lcd.clear();
   triagemFinalizada = true;
 
-  if (pontuacao <= 1) {
+  // LOGICA PARA COMBO DE VOMITO E DIARREIA
+  if (teveVomito && teveDiarreia) {
+    lcd.setCursor(0, 0);
+    lcd.print("EMERGENCIA!");
+    lcd.setCursor(0, 1);
+    lcd.print("Vomito+Diarreia");
+    acenderLed(LED_VERM);
+  } else if (pontuacao <= 1) {
     lcd.setCursor(0, 0);
     lcd.print("Risco: BAIXO");
     lcd.setCursor(0, 1);
@@ -85,14 +95,18 @@ void mostrarResultado() {
   Serial.println(pontuacao);
 }
 
+// ZERA TUDO PARA COMEÇAR DE NOVO
 void reiniciarTriagem() {
   perguntaAtual = 0;
   pontuacao = 0;
+  teveVomito = false;
+  teveDiarreia = false;
   triagemFinalizada = false;
   acenderLed(LED_VERDE);
   mostrarPergunta();
 }
 
+// CONFIGURA O INICIO DO SISTEMA E PINOS
 void setup() {
   Serial.begin(115200);
 
@@ -114,6 +128,7 @@ void setup() {
   reiniciarTriagem();
 }
 
+// FICA RODANDO E CHECANDO OS BOTOES
 void loop() {
   unsigned long agora = millis();
 
@@ -129,6 +144,8 @@ void loop() {
 
   if (digitalRead(BTN_SIM) == LOW) {
     ultimoDebounce = agora;
+    if (perguntaAtual == 3) teveVomito = true;
+    if (perguntaAtual == 4) teveDiarreia = true;
     if (perguntaAtual >= 3) pontuacao++;
     perguntaAtual++;
     if (perguntaAtual >= TOTAL_PERGUNTAS) mostrarResultado();
