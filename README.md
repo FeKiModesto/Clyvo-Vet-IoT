@@ -125,7 +125,7 @@ python main.py pet_happyDog.jpg
 
 ## Demonstração em Vídeo
 
-Em breve.
+[Clique aqui para acessar o vídeo demonstrativo](https://youtu.be/OdckBXN8RVk)
 
 ---
 
