@@ -78,13 +78,16 @@ Exemplo de resposta do `GET /api/status`:
 
 ### Dashboard Web
 
-O dashboard e a API REST estão implementados no `sketch.ino` e funcionam corretamente durante a simulação. O acesso via browser requer licença do Wokwi for VS Code ou hardware ESP32 físico.
+O dashboard e a API REST estão implementados no `src/sketch.ino` e funcionam corretamente durante a simulação. O acesso via browser requer licença do Wokwi for VS Code ou hardware ESP32 físico.
 
-Para visualizar, após iniciar a simulação:
-1. Verifique o IP gerado no **Serial Monitor**
-2. Acesse `http://<IP>` no navegador
-3. O dashboard atualiza automaticamente a cada 3 segundos
-4. Os endpoints podem ser testados via Postman
+Para visualizar durante a simulação no VS Code:
+1. Instale as extensões **Wokwi Simulator** e **PlatformIO IDE** no VS Code
+2. Abra a pasta do projeto no VS Code
+3. Compile o projeto: PlatformIO (formiguinha) → **esp32dev** → **Build**
+4. Inicie a simulação: `F1` → **Wokwi: Start Simulator**
+5. Acesse `http://localhost:8180` no navegador
+6. O dashboard atualiza automaticamente a cada 3 segundos
+7. Os endpoints podem ser testados via Postman
 
 ---
 
@@ -109,9 +112,9 @@ python main.py PrEppY_MoUsE.jpg
 python main.py pet_happyDog.jpg
 ```
 
-### Hardware IoT
+### Hardware IoT — Wokwi Online
 
-1. Acesse o projeto no Wokwi pelo link abaixo
+1. Acesse o projeto pelo link abaixo
 2. Clique em **Play** (▶) para iniciar a simulação
 3. Aguarde a tela de boas-vindas **CLYVO VET**
 4. Use o **botão verde** para responder **SIM**
@@ -120,6 +123,14 @@ python main.py pet_happyDog.jpg
 7. Pressione qualquer botão para reiniciar a triagem
 
 [Clique aqui para acessar o projeto no Wokwi](https://wokwi.com/projects/462584624524506113)
+
+### Hardware IoT — VS Code + Wokwi
+
+1. Instale as extensões **Wokwi Simulator** e **PlatformIO IDE** no VS Code
+2. Clone o repositório e abra a pasta no VS Code
+3. Na aba do PlatformIO → **esp32dev** → **Build**
+4. Pressione `F1` → **Wokwi: Start Simulator**
+5. Acesse o dashboard em `http://localhost:8180`
 
 ---
 
@@ -133,18 +144,20 @@ python main.py pet_happyDog.jpg
 ```
 Clyvo-Vet-IoT/
 ├── Clyvo_IA/
-│   ├── main.py              → Script de visão computacional
-│   ├── pet.jpg              → Imagem de teste (gato)
-│   ├── peixoto.jpg          → Imagem de teste (peixe)
+│   ├── main.py                  → Script de visão computacional
+│   ├── pet.jpg                  → Imagem de teste (gato)
+│   ├── peixoto.jpg              → Imagem de teste (peixe)
 │   ├── pet_lorito_elegante.jpg  → Imagem de teste (periquito)
-│   ├── PrEppY_MoUsE.jpg     → Imagem de teste (hamster)
+│   ├── PrEppY_MoUsE.jpg         → Imagem de teste (hamster)
 │   └── pet_happyDog.jpg         → Imagem de teste (cachorro)
 ├── docs/
-│   └── componentes.md       → Detalhes dos componentes
-├── diagram.json             → Diagrama do circuito no Wokwi
-├── wokwi.toml               → Configuração do Wokwi for VS Code
-├── sketch.ino               → Código principal do ESP32
-└── README.md                → Documentação principal
+│   └── componentes.md           → Detalhes dos componentes
+├── src/
+│   └── sketch.ino               → Código principal do ESP32
+├── diagram.json                 → Diagrama do circuito no Wokwi
+├── platformio.ini               → Configuração do PlatformIO
+├── wokwi.toml                   → Configuração do Wokwi for VS Code
+└── README.md                    → Documentação principal
 ```
 
 ---
